@@ -89,6 +89,4 @@ app.get("/", (req, res) => {
 const PORT = process.env.PORT || 3001;
 app.listen(PORT, () => {
   console.log(`Server running on http://localhost:${PORT}`);
-  console.log(`All items endpoint: http://localhost:${PORT}/api/items`);
-  console.log(`Best deals endpoint: http://localhost:${PORT}/api/best-deals`);
 });
