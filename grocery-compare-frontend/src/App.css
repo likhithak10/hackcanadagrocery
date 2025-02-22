@@ -82,11 +82,11 @@ body {
 
 /* Dark Mode Adjustments for Header Title and Controls */
 .app-container.dark .header h1 {
-  color: #000000; /* Dark text for h1 in dark mode */
+  color: #000000;
 }
 
 .app-container.dark .header h2 {
-  color: #333333; /* Dark gray text for h2 in dark mode */
+  color: #333333;
 }
 
 .app-container.dark .header .header-controls,
@@ -94,7 +94,7 @@ body {
   color: #000000;
 }
 
-/* Leaves Animation in Header */
+/* Flying Leaves Animation */
 .leaves-container {
   position: absolute;
   top: 0;
@@ -108,14 +108,12 @@ body {
   position: absolute;
   width: 50px;
   height: 50px;
-  background-image: url('https://upload.wikimedia.org/wikipedia/commons/c/c7/White_maple_leaf_symbol.png'); /* Replace with your leaf image URL */
+  background-image: url('https://upload.wikimedia.org/wikipedia/commons/c/c7/White_maple_leaf_symbol.png');
   background-size: contain;
   background-repeat: no-repeat;
   opacity: 0.8;
   animation: fly 10s linear infinite;
 }
-
-/* Different positions and delays for each leaf */
 .leaf:nth-child(1) {
   left: 10%;
   animation-delay: 0s;
@@ -164,14 +162,14 @@ body {
   margin-bottom: 30px;
 }
 
-.location-input,
+/* Removed extra location input from here */
+
+/* Search Input (for product search) */
 .search-input {
   width: 100%;
   max-width: 500px;
   display: flex;
 }
-
-.location-input input,
 .search-input input {
   flex: 1;
   padding: 12px;
@@ -180,25 +178,23 @@ body {
   border-radius: 4px;
   transition: border-color 0.3s ease;
 }
-
-.location-input input:focus,
 .search-input input:focus {
-  border-color: #ff6666; /* light red focus */
+  border-color: #ff6666;
   outline: none;
 }
 
+/* Button for current location */
 .location-input button {
   padding: 12px 20px;
   font-size: 1rem;
   margin-left: 10px;
   border: none;
-  background-color: #ff0202; /* light red button */
+  background-color: #ff0202;
   color: #fff;
   border-radius: 4px;
   cursor: pointer;
   transition: background-color 0.3s ease;
 }
-
 .location-input button:hover {
   background-color: #ff5252;
 }
@@ -210,16 +206,14 @@ body {
   align-items: center;
   min-height: 200px;
 }
-
 .spinner {
   border: 8px solid #f3f3f3;
-  border-top: 8px solid #ff6666; /* light red spinner */
+  border-top: 8px solid #ff6666;
   border-radius: 50%;
   width: 60px;
   height: 60px;
   animation: spin 1s linear infinite;
 }
-
 @keyframes spin {
   0% { transform: rotate(0deg); }
   100% { transform: rotate(360deg); }
@@ -230,19 +224,16 @@ body {
   margin: 40px 0;
   text-align: center;
 }
-
 .deals-gallery h2 {
   font-size: 2.2rem;
   color: #ff4d4d;
   margin-bottom: 20px;
 }
-
 .gallery-grid {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
   gap: 20px;
 }
-
 .gallery-card {
   background-color: #fff;
   border-radius: 8px;
@@ -250,28 +241,23 @@ body {
   box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
   transition: transform 0.3s ease, box-shadow 0.3s ease;
 }
-
 .gallery-card:hover {
   transform: translateY(-5px);
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
 }
-
 .gallery-card img {
   width: 100%;
   height: 150px;
   object-fit: cover;
 }
-
 .deal-info {
   padding: 10px;
 }
-
 .deal-info h4 {
   margin-bottom: 5px;
   font-size: 1.3rem;
   color: #ff6666;
 }
-
 .deal-info p {
   margin: 0;
   font-size: 1rem;
@@ -284,7 +270,6 @@ body {
   grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
   gap: 20px;
 }
-
 .item-card {
   background-color: #fff;
   border: 1px solid #ddd;
@@ -292,31 +277,25 @@ body {
   padding: 20px;
   transition: transform 0.3s ease, box-shadow 0.3s ease;
 }
-
 .item-card:hover {
   transform: translateY(-5px);
   box-shadow: 0 8px 16px rgba(0, 0, 0, 0.1);
 }
-
 .item-card h3 {
   color: #ff6666;
   margin-bottom: 10px;
   font-size: 1.6rem;
 }
-
 .item-card p {
   margin-bottom: 10px;
   font-size: 1rem;
 }
-
 .label {
   font-weight: bold;
 }
-
 .store-name {
   font-style: italic;
 }
-
 .availability {
   font-size: 0.9rem;
   color: #777;
@@ -329,7 +308,6 @@ body {
   font-weight: bold;
   margin-top: 10px;
 }
-
 .details ul {
   list-style-type: disc;
   padding-left: 20px;
@@ -345,7 +323,109 @@ body {
   font-size: 0.9rem;
   color: #555;
 }
-
 .app-container.dark .footer {
   color: #aaa;
 }
+
+/* MapView Section */
+.map-view {
+  margin-top: 40px;
+}
+#map {
+  width: 100%;
+  height: 400px;
+  margin-bottom: 20px;
+}
+#store-list {
+  background: #fff;
+  padding: 20px;
+  border-radius: 4px;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+  margin-bottom: 40px;
+}
+#store-list h2 {
+  margin-bottom: 10px;
+}
+#store-list ul {
+  list-style: none;
+  padding: 0;
+}
+#store-list li {
+  padding: 5px 0;
+  border-bottom: 1px solid #eee;
+}
+
+/* Style for the search button in the location search container */
+#search-container button {
+  padding: 10px 50px;
+  font-size: 1rem;
+  font-weight: 500;
+  color: #fff;
+  background: linear-gradient(135deg, #ff4d4d, #ff1a1a);
+  border: none;
+  border-radius: 25px;
+  cursor: pointer;
+  transition: background 0.3s ease, transform 0.2s ease;
+  box-shadow: 0 3px 6px rgba(0, 0, 0, 0.16);
+}
+
+#search-container button:hover {
+  background: linear-gradient(135deg, #ff1a1a, #ff4d4d);
+  transform: scale(1.05);
+}
+
+#search-container button:active {
+  transform: scale(0.98);
+}
+
+/* Style the location input inside the #search-container */
+#search-container input {
+  padding: 10px 15px;
+  font-size: 1rem;
+  border: 2px solid #ff4d4d; /* Light red border to match your button theme */
+  border-radius: 25px;      /* Rounded corners for a pill shape */
+  background-color: #fff;   /* White background for clarity */
+  color: #333;              /* Dark text color */
+  outline: none;
+  transition: border-color 0.3s ease, box-shadow 0.3s ease;
+}
+
+#search-container input:focus {
+  border-color: #ff1a1a;    /* Darker red on focus */
+  box-shadow: 0 0 0 2px rgba(255, 77, 77, 0.2); /* Subtle focus ring */
+}
+
+#search-container input:hover {
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1); /* Slight hover shadow */
+}
+
+#search-container {
+  position: absolute;     /* So it can be placed over the map */
+  top: 400px;              /* Adjust vertical spacing from the top */
+  left: 50%;              /* Start in the horizontal center */
+  transform: translateX(-50%); /* Shift back left by half its width to truly center */
+  display: flex;          /* Use flex so input & button line up nicely */
+  gap: 10px;              /* Spacing between input and button */
+  z-index: 5;             /* Keep it above the map */
+}
+
+/* Optionally, add a background or padding to make it more visible */
+#search-container {
+  background: rgba(255, 255, 255, 0.8);
+  padding: 10px 20px;
+  border-radius: 25px;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.3);
+}
+
+.app-description {
+  font-size: 1.3rem;
+  font-family: 'Courier New', Courier, monospace;
+  text-align: center;
+  margin-bottom: 20px;
+  color: #262626; /* Adjust color as desired */
+  max-width: 800px;
+  margin-left: auto;
+  margin-right: auto;
+  line-height: 1.4;
+}
+
