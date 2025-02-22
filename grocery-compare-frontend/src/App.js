@@ -64,7 +64,7 @@ function MapView({ onLocationChange, coords }) {
       
     }
   }, [onLocationChange]);
-
+  //blonde
   // When parent's coords update, recenter the map.
   useEffect(() => {
     if (map && coords) {
