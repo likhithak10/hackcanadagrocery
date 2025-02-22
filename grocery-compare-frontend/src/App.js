@@ -1,23 +1,213 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useRef } from "react";
 import axios from "axios";
 import "./App.css"; // Import our CSS file
+
+// MapView Component: Renders a Google Map with an autocomplete location input.
+// When a location is searched (via autocomplete or Search button), it clears old markers and store list,
+// then searches for the closest Walmart, No Frills, and Sobeys and pins them on the map.
+function MapView({ onLocationChange, coords }) {
+  const [map, setMap] = useState(null);
+  const markersRef = useRef([]); // useRef to store markers without triggering re-renders
+
+  // Load Google Maps API and initialize the map.
+  useEffect(() => {
+    const googleScript = document.createElement("script");
+    // Replace with your actual API key
+    googleScript.src =
+      "https://maps.googleapis.com/maps/api/js?key=AIzaSyCodFuwZnIn1sJu08OdpieZsr2RH49kWG4&libraries=places";
+    googleScript.async = true;
+    googleScript.defer = true;
+    googleScript.onload = initMap;
+    document.head.appendChild(googleScript);
+
+    function initMap() {
+      const m = new window.google.maps.Map(document.getElementById("map"), {
+        center: { lat: 43.6532, lng: -79.3832 }, // Default: Toronto
+        zoom: 13,
+      });
+      setMap(m);
+
+      // Create a search box tied to the input element.
+      const input = document.getElementById("location-input");
+      const searchBox = new window.google.maps.places.SearchBox(input);
+
+      // Bias results toward the current map's viewport.
+      m.addListener("bounds_changed", () => {
+        searchBox.setBounds(m.getBounds());
+      });
+
+      // When a user selects a prediction from the autocomplete dropdown.
+      searchBox.addListener("places_changed", () => {
+        const places = searchBox.getPlaces();
+        if (!places || places.length === 0) return;
+        const place = places[0];
+        if (!place.geometry || !place.geometry.location) return;
+
+        // Clear old markers and store list.
+        clearMarkers();
+        clearStoreList();
+
+        // Recenter the map.
+        m.setCenter(place.geometry.location);
+        m.setZoom(13);
+
+        // Update parent's coordinates.
+        if (onLocationChange) {
+          onLocationChange(place.geometry.location);
+        }
+        // Perform nearby search for specific chains.
+        performNearbySearch(place.geometry.location);
+      }
+    
+    );
+
+      
+    }
+  }, [onLocationChange]);
+
+  // When parent's coords update, recenter the map.
+  useEffect(() => {
+    if (map && coords) {
+      map.setCenter(coords);
+      map.setZoom(13);
+    }
+  }, [map, coords]);
+
+  // Remove existing markers from the map.
+  const clearMarkers = () => {
+    markersRef.current.forEach((marker) => marker.setMap(null));
+    markersRef.current = [];
+  };
+
+  // Clear the store list.
+  const clearStoreList = () => {
+    const ul = document.getElementById("stores-ul");
+    if (ul) ul.innerHTML = "";
+  };
+
+  // Append store details to the store list.
+  const addStoreToList = (chainName, place) => {
+    const ul = document.getElementById("stores-ul");
+    if (ul) {
+      const li = document.createElement("li");
+      li.innerHTML = `<strong>${chainName}</strong>: ${place.name} - ${place.vicinity}`;
+      ul.appendChild(li);
+    }
+  };
+
+  // Search for a specific grocery chain near the given location.
+  const searchForStore = (storeName, userLocation) => {
+    const service = new window.google.maps.places.PlacesService(map);
+    const request = {
+      location: userLocation,
+      rankBy: window.google.maps.places.RankBy.DISTANCE,
+      keyword: storeName,
+    };
+
+    service.nearbySearch(request, (results, status) => {
+      if (
+        status === window.google.maps.places.PlacesServiceStatus.OK &&
+        results &&
+        results.length
+      ) {
+        // Filter results strictly to include the chain name.
+        const filteredResults = results.filter((place) =>
+          place.name.toLowerCase().includes(storeName.toLowerCase())
+        );
+        const place = filteredResults.length > 0 ? filteredResults[0] : results[0];
+
+        const marker = new window.google.maps.Marker({
+          position: place.geometry.location,
+          map: map,
+          title: `${storeName}: ${place.name}`,
+        });
+        markersRef.current.push(marker);
+
+        const infowindow = new window.google.maps.InfoWindow({
+          content: `<strong>${storeName}</strong><br>${place.name}<br>${place.vicinity}`,
+        });
+        marker.addListener("click", () => {
+          infowindow.open(map, marker);
+        });
+
+        addStoreToList(storeName, place);
+      } else {
+        console.log("No results found for " + storeName);
+        addStoreToList(storeName, { name: "Not found", vicinity: "N/A" });
+      }
+    });
+  };
+
+  // Perform nearby search for the closest Walmart, No Frills, and Sobeys.
+  const performNearbySearch = (userLocation) => {
+    clearMarkers();
+    clearStoreList();
+    ["Walmart", "No Frills", "Sobeys"].forEach((chain) =>
+      searchForStore(chain, userLocation)
+    );
+  };
+
+  // Handler for the Search button click (manual address input).
+  const handleSearchClick = () => {
+    const address = document.getElementById("location-input").value;
+    if (!address) {
+      alert("Please enter a location.");
+      return;
+    }
+    const geocoder = new window.google.maps.Geocoder();
+    geocoder.geocode({ address: address }, (results, status) => {
+      if (status === "OK" && results[0]) {
+        const userLocation = results[0].geometry.location;
+        clearMarkers();
+        clearStoreList();
+        map.setCenter(userLocation);
+        map.setZoom(13);
+        ["Walmart", "No Frills", "Sobeys"].forEach((chain) =>
+          searchForStore(chain, userLocation)
+        );
+        if (onLocationChange) {
+          onLocationChange(userLocation);
+        }
+      } else {
+        alert("Geocode was not successful: " + status);
+      }
+    });
+  };
+
+  return (
+    <div className="map-view">
+      <div id="search-container">
+        <input
+          id="location-input"
+          type="text"
+          placeholder="Enter a location"
+        />
+        <button id="search-btn" onClick={handleSearchClick}>
+          Search
+        </button>
+      </div>
+      <div id="map"></div>
+      <div id="store-list">
+        <h2>Nearest Grocery Stores</h2>
+        <ul id="stores-ul"></ul>
+      </div>
+    </div>
+  );
+}
 
 function App() {
   const [items, setItems] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
   const [searchTerm, setSearchTerm] = useState("");
-  const [userLocation, setUserLocation] = useState("");
   const [coords, setCoords] = useState(null);
   const [darkMode, setDarkMode] = useState(false);
 
-  // Fetch items whenever the location or manual input changes.
+  // Fetch items from backend whenever coordinates change.
   useEffect(() => {
     setIsLoading(true);
     let url = "http://localhost:3001/api/items";
     if (coords) {
       url += `?lat=${coords.lat}&lng=${coords.lng}`;
-    } else if (userLocation) {
-      url += `?location=${encodeURIComponent(userLocation)}`;
     }
     axios
       .get(url)
@@ -29,9 +219,9 @@ function App() {
         console.error("Error fetching items:", error);
         setIsLoading(false);
       });
-  }, [coords, userLocation]);
+  }, [coords]);
 
-  // Use browser geolocation API to get current location.
+  // Use browser geolocation to update coordinates.
   const fetchCurrentLocation = () => {
     if (navigator.geolocation) {
       navigator.geolocation.getCurrentPosition(
@@ -50,12 +240,12 @@ function App() {
     }
   };
 
-  // Filter items based on the search term.
+  // Filter items based on product search term.
   const filteredItems = items.filter((item) =>
     item.name.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
-  // Group items by name for best-price logic.
+  // Group filtered items by name.
   const groupedItems = filteredItems.reduce((acc, item) => {
     const key = item.name;
     if (!acc[key]) {
@@ -78,7 +268,8 @@ function App() {
         bestPrice: null,
         availability: "Out of Stock Everywhere",
         allStores: storeEntries,
-        image: storeEntries[0]?.image || "https://via.placeholder.com/150",
+        image:
+          storeEntries[0]?.image || "https://via.placeholder.com/150",
       };
     }
     available.sort((a, b) => a.price - b.price);
@@ -96,7 +287,6 @@ function App() {
     };
   });
 
-  // Toggle dark mode.
   const toggleDarkMode = () => {
     setDarkMode((prevMode) => !prevMode);
   };
@@ -111,7 +301,6 @@ function App() {
             {darkMode ? "Light Mode" : "Dark Mode"}
           </button>
         </div>
-        {/* Flying Leaves Animation */}
         <div className="leaves-container">
           <div className="leaf"></div>
           <div className="leaf"></div>
@@ -122,25 +311,9 @@ function App() {
       </header>
 
       <section className="location-section">
-        <div className="location-input">
-          <input
-            type="text"
-            placeholder="Enter your location..."
-            value={userLocation}
-            onChange={(e) => setUserLocation(e.target.value)}
-          />
-          <button onClick={fetchCurrentLocation}>
-            Use My Current Location
-          </button>
-        </div>
-        <div className="search-input">
-          <input
-            type="text"
-            placeholder="Search item..."
-            value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
-          />
-        </div>
+      <p className="app-description">
+          Discover the cheapest prices for your essential groceries at the 3 most popular, money-saving grocery stores nearest to you.
+        </p>
       </section>
 
       {isLoading ? (
@@ -149,7 +322,6 @@ function App() {
         </div>
       ) : (
         <>
-          {/* Best Deals Gallery Section */}
           <section className="deals-gallery">
             <h2>Best Deals Gallery</h2>
             <div className="gallery-grid">
@@ -171,7 +343,6 @@ function App() {
             </div>
           </section>
 
-          {/* Detailed Items Section */}
           <section className="items-section">
             {itemsWithBestPrice.map((item) => (
               <div key={item.name} className="item-card">
@@ -202,6 +373,9 @@ function App() {
           </section>
         </>
       )}
+
+      {/* Render MapView with autocomplete and specific grocery chain search */}
+      <MapView onLocationChange={setCoords} coords={coords} />
 
       <footer className="footer">
         <p>&copy; 2025 Grocery Price Watch. All rights reserved.</p>
