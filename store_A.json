@@ -1,0 +1,27 @@
+[
+    {
+      "name": "Milk 2L",
+      "store": "Store A",
+      "price": 3.49,
+      "availability": "In Stock"
+    },
+    {
+      "name": "Chocolate Milk 2L",
+      "store": "Store A",
+      "price": 4.80,
+      "availability": "In Stock"
+    },
+    {
+      "name": "Milk 2L",
+      "store": "Store B",
+      "price": 3.49,
+      "availability": "In Stock"
+    },
+    {
+      "name": "Milk 2L",
+      "store": "Store C",
+      "price": 3.29,
+      "availability": "In Stock"
+    }
+  ]
+  
