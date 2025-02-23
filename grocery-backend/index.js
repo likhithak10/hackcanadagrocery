@@ -80,11 +80,6 @@ app.get("/api/best-deals", (req, res) => {
   res.json(bestDeals);
 });
 
-// ------------------ Root Route (Optional) ------------------
-app.get("/", (req, res) => {
-  res.send("Welcome to the Grocery Compare API!");
-});
-
 // ------------------ Start Server ------------------
 const PORT = process.env.PORT || 3001;
 app.listen(PORT, () => {
